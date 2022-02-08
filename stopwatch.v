@@ -28,7 +28,3 @@ module stopwatch(
 
 endmodule
 
-module stopwatch_testbench();
-	
-
-endmodule  
