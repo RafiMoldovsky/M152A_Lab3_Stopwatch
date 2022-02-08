@@ -31,7 +31,7 @@ stopwatch stopwatch_uut(.clk(clk),.seg(seg),.an(an));
 initial begin
     clk=0;
     seg=8'b11111111;
-    an=4'b0000;
+    an=4'b1111;
 end
 
 always begin
