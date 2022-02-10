@@ -21,8 +21,8 @@
 module clock_divider(
     input wire clk,
     input wire rst,
-    output wire 2hz_clk,
-    output wire 1hz_clk,
+    output wire twohz_clk,
+    output wire onehz_clk,
     output wire blink_clk,
     output wire much_faster_clk
 );
@@ -30,8 +30,8 @@ module clock_divider(
 //100 MHz = 10^8 Hz master clock 
 //want a 2hz, 1hz, >1hz, and a 50-700hz - as outputs 
 
-reg 2hz_clk_register; 
-reg 1hz_clk_register;
+reg twohz_clk_register; 
+reg onehz_clk_register;
 reg blink_clk_register;
 reg much_faster_clk_register;
 
@@ -40,8 +40,8 @@ reg [31:0] counter_1;
 reg [31:0] counter_blink;
 reg [31:0] counter_much_faster;
 
-localparam 2hz_divisor = 25000000;
-localparam 1hz_divisor=50000000;
+localparam twohz_divisor = 25000000;
+localparam onehz_divisor=50000000;
 //for blink, will use a 4hz clk
 localparam blink_divisor = 6250000;
 //for much faster, will use 500 hz;
@@ -50,11 +50,11 @@ localparam faster_divisor=100000;
 always @(posedge clk)
 begin
     if(rst) begin
-        2hz_clk_register<=0;
+        twohz_clk_register<=0;
         counter_2<=32'b0;
     end
-    else if(counter_2 == 2hz_divisor-1) begin
-        2hz_clk_register<= ~2hz_clk_register;
+    else if(counter_2 == twohz_divisor-1) begin
+        twohz_clk_register<= ~twohz_clk_register;
         counter_2<=32'b0;
     end 
     else
@@ -65,11 +65,11 @@ end
 always @(posedge clk)
 begin
     if(rst) begin
-        1hz_clk_register<=0;
+        onehz_clk_register<=0;
         counter_1<=32'b0;
     end
-    else if(counter_1 == 1hz_divisor-1) begin
-        1hz_clk_register<= ~1hz_clk_register;
+    else if(counter_1 == onehz_clk_register-1) begin
+        onehz_clk_register<= ~onehz_clk_register;
         counter_1<=32'b0;
     end 
     else
@@ -107,8 +107,8 @@ begin
     end 
 end 
 
-assign 2hz_clk=2hz_clk_register;
-assign 1hz_clk=1hz_clk_register;
+assign twohz_clk=twohz_clk_register;
+assign onehz_clk=onehz_clk_register;
 assign blink_clk=blink_clk_register;
 assign much_faster_clk=much_faster_clk_register;
 
