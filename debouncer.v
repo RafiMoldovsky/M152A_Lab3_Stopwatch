@@ -28,25 +28,24 @@ reg button_output_reg;
 wire [3:0] count_sum;
 
 
-always @(posedge clk)
+always @(posedge clk) begin
     if(button==0)
     begin
-        count<=[count[8:0],0];
+        count<={count[8:0],0};
         if(count_sum<=3) begin
-            button_output<=0;
+            button_output_reg<=0;
         end
     end
     else
     begin
-        count<=[count[8:0],1'b1];
+        count<={count[8:0],1'b1};
         if(count_sum>=7)
         begin
             count <= 0;
-            count_sum<=0;
             button_output_reg<=1;
         end
         else if(count_sum<=3) begin
-            button_output<=0;
+            button_output_reg<=0;
         end
     end
 end
