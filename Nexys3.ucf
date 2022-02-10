@@ -5,8 +5,8 @@
 
 ##Clock signal
 Net "clk" LOC=V10 | IOSTANDARD=LVCMOS33;
-#Net "clk" TNM_NET = sys_clk_pin;
-#TIMESPEC TS_sys_clk_pin = PERIOD sys_clk_pin 100000 kHz;
+Net "clk" TNM_NET = sys_clk_pin;
+TIMESPEC TS_sys_clk_pin = PERIOD sys_clk_pin 100000 kHz;
 
 ## onBoard USB controller
 #Net "EppAstb" LOC = H1 | IOSTANDARD = LVCMOS33; #Bank = 3, pin name = IO_L41N_GCLK26_M3DQ5, Sch name = U-FLAGA
@@ -176,7 +176,7 @@ Net "an<3>" LOC = P17 | IOSTANDARD = LVCMOS33; #Bank = 1, pin name = IO_L49P_M1D
 #Net "btns" LOC = B8 | IOSTANDARD = LVCMOS33; #Bank = 0, pin name = IO_L33P, Sch name = BTNS
 #Net "btnu" LOC = A8 | IOSTANDARD = LVCMOS33; #Bank = 0, pin name = IO_L33N, Sch name = BTNU
 #Net "btnl" LOC = C4 | IOSTANDARD = LVCMOS33; #Bank = 0, pin name = IO_L1N_VREF, Sch name = BTNL
-#Net "btnd" LOC = C9 | IOSTANDARD = LVCMOS33; #Bank = 0, pin name = IO_L34N_GCLK18, Sch name = BTND
+Net "btnd" LOC = C9 | IOSTANDARD = LVCMOS33; #Bank = 0, pin name = IO_L34N_GCLK18, Sch name = BTND
 #Net "btnr" LOC = D9 | IOSTANDARD = LVCMOS33; # Bank = 0, pin name = IO_L34P_GCLK19, Sch name = BTNR
 
 ## VGA Connector
