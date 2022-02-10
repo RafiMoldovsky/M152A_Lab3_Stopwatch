@@ -21,6 +21,7 @@
 module stopwatch(
     input clk,
 	 input btnd,
+	 input btnr,
 	 output [7:0] seg,
 	 output [3:0] an
     );
@@ -31,22 +32,40 @@ wire blink_clk;
 wire much_faster_clk;
 
 wire rst;
-debouncer RstDebouncer(.clk(much_faster_clk), .button(btnd), .button_output(rst));
+debouncer RstDebouncer(.clk_sys(clk), .button(btnd), .button_output(rst));
+
+wire pause;
+debouncer PauseDebouncer(.clk_sys(clk), .button(btnr), .button_output(pause));
+
+reg pause_reg;
+always @(posedge pause) begin
+	pause_reg <= ~pause_reg;
+end
 
 reg [12:0] sec_counter;
 wire [6:0] minutes;
 wire [5:0] seconds;
 
+
 assign minutes = sec_counter/60;
 assign seconds = sec_counter%60;
-
-always @(posedge onehz_clk) begin
+/*
+reg pending_rst;
+always @(posedge much_faster_clk)
 	if (rst == 1)
-		sec_counter <= 0;
-	else if (sec_counter == 3599)
+		pending_rst <= 1;
+		*/
+		
+always @(posedge onehz_clk or posedge rst) begin
+if (rst)
+	sec_counter <= 0;
+else if (!pause_reg)
+		begin
+	if (sec_counter == 3599)
 		sec_counter <= 0;
 	else
 		sec_counter <= sec_counter+1;
+	end
 end
 
 clock_divider ClockDivider(.clk(clk), .rst(0),
