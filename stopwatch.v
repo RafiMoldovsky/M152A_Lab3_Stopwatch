@@ -20,14 +20,41 @@
 //////////////////////////////////////////////////////////////////////////////////
 module stopwatch(
     input clk,
+	 input btnd,
 	 output [7:0] seg,
 	 output [3:0] an
     );
 wire clk_slow;	 
+wire twohz_clk;
+wire onehz_clk;
+wire blink_clk;
+wire much_faster_clk;
+
+wire rst;
+debouncer RstDebouncer(.clk(much_faster_clk), .button(btnd), .button_output(rst));
+
+reg [12:0] sec_counter;
+wire [6:0] minutes;
+wire [5:0] seconds;
+
+assign minutes = sec_counter/60;
+assign seconds = sec_counter%60;
+
+always @(posedge onehz_clk) begin
+	if (rst == 1)
+		sec_counter <= 0;
+	else if (sec_counter == 3599)
+		sec_counter <= 0;
+	else
+		sec_counter <= sec_counter+1;
+end
+
+clock_divider ClockDivider(.clk(clk), .rst(0),
+.twohz_clk(twohz_clk), .onehz_clk(onehz_clk), .blink_clk(blink_clk),
+.much_faster_clk(much_faster_clk));
 	 
-slow_clock SlowClock(.clk(clk), .clk_slow(clk_slow));
-	 
-fourdig_7seg FourDigSevenSeg(.clk(clk_slow), .minutes(23), .seconds(45), .seg(seg), .an(an));
+fourdig_7seg FourDigSevenSeg(.clk(much_faster_clk), .minutes(minutes), .seconds(seconds), .seg(seg), .an(an));
+
 
 endmodule
 
@@ -96,8 +123,10 @@ else if (dig == 1)
 	else if (dig == 8)
 	seg = 8'b10000000; // ABCDEFG
 	else if (dig == 9)
-	seg = 8'b10100000; // ABCDFG
+	seg = 8'b10010000; // ABCDFG
 	// 
 end
 	
 endmodule
+
+
