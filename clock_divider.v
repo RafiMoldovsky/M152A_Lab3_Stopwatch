@@ -57,8 +57,8 @@ begin
         twohz_clk_register<= ~twohz_clk_register;
         counter_2<=32'b0;
     end 
-    else
-        counter_2=counter_2+32'b1;
+    else begin
+        counter_2<=counter_2+32'b1;
     end 
 end 
 
@@ -68,12 +68,12 @@ begin
         onehz_clk_register<=0;
         counter_1<=32'b0;
     end
-    else if(counter_1 == onehz_clk_register-1) begin
+    else if(counter_1 == onehz_divisor-1) begin
         onehz_clk_register<= ~onehz_clk_register;
         counter_1<=32'b0;
     end 
-    else
-        counter_1=counter_1+32'b1;
+    else begin
+        counter_1<=counter_1+32'b1;
     end 
 end 
 
@@ -87,8 +87,8 @@ begin
         blink_clk_register<= ~blink_clk_register;
         counter_blink<=32'b0;
     end 
-    else
-        counter_blink=counter_blink+32'b1;
+    else begin
+        counter_blink<=counter_blink+32'b1;
     end 
 end 
 
@@ -102,8 +102,8 @@ begin
         much_faster_clk_register<= ~much_faster_clk_register;
         counter_much_faster<=32'b0;
     end 
-    else
-        counter_much_faster=counter_much_faster+32'b1;
+    else begin
+        counter_much_faster<=counter_much_faster+32'b1;
     end 
 end 
 
