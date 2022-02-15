@@ -85,14 +85,14 @@ begin
 	if(sw[1]==0) begin
 		//change minutes and blink
 		blink_which <= 4'b1100;
-		sec_counter<=sec_counter+60;
+		sec_counter<= (sec_counter+60) % 3600;
 		end
 	if(sw[1]==1)begin
 		blink_which <= 4'b0011;
 		if (seconds == 59)
-			sec_counter <= sec_counter - 59;
+			sec_counter <= (sec_counter - 59) % 3600;
 		else
-			sec_counter <= sec_counter + 1;
+			sec_counter <= (sec_counter + 1) % 3600;
 	end
 end
 end
