@@ -22,6 +22,8 @@ module stopwatch(
     input clk,
 	 input btnd,
 	 input btnr,
+	 input [7:0] sw,
+	 
 	 output [7:0] seg,
 	 output [3:0] an
     );
@@ -45,10 +47,18 @@ end
 reg [12:0] sec_counter;
 wire [6:0] minutes;
 wire [5:0] seconds;
+reg [5:0] seconds_for_adj;
+
+reg [7:0] sw_deb;
+always @(posedge much_faster_clk) begin
+	sw_deb <= sw;
+end
+	
 
 
 assign minutes = sec_counter/60;
 assign seconds = sec_counter%60;
+
 /*
 reg pending_rst;
 always @(posedge much_faster_clk)
@@ -56,23 +66,44 @@ always @(posedge much_faster_clk)
 		pending_rst <= 1;
 		*/
 		
-always @(posedge onehz_clk or posedge rst) begin
-if (rst)
+reg onehz_div;
+reg [3:0] blink_which;
+
+always @(posedge twohz_clk or posedge rst) begin
+if (rst) begin
 	sec_counter <= 0;
-else if (!pause_reg)
-		begin
-	if (sec_counter == 3599)
-		sec_counter <= 0;
-	else
-		sec_counter <= sec_counter+1;
+	onehz_div <= 0;
+	blink_which <= 0;
+end
+else if (!pause_reg && !sw_deb[0]) begin // normal operation
+		sec_counter <= (sec_counter+(onehz_div))%3600;
+		onehz_div <= ~onehz_div;
+		blink_which <= 0;
+end
+else if (!pause_reg && sw_deb[0]) // adjustment mode
+begin
+	if(sw[1]==0) begin
+		//change minutes and blink
+		blink_which <= 4'b1100;
+		sec_counter<=sec_counter+60;
+		end
+	if(sw[1]==1)begin
+		blink_which <= 4'b0011;
+		if (seconds == 59)
+			sec_counter <= sec_counter - 59;
+		else
+			sec_counter <= sec_counter + 1;
 	end
 end
+end
+
 
 clock_divider ClockDivider(.clk(clk), .rst(0),
 .twohz_clk(twohz_clk), .onehz_clk(onehz_clk), .blink_clk(blink_clk),
 .much_faster_clk(much_faster_clk));
 	 
-fourdig_7seg FourDigSevenSeg(.clk(much_faster_clk), .minutes(minutes), .seconds(seconds), .seg(seg), .an(an));
+fourdig_7seg FourDigSevenSeg(.clk(much_faster_clk), .blink_clk(blink_clk), .blink_which(blink_which),
+.minutes(minutes), .seconds(seconds), .seg(seg), .an(an));
 
 
 endmodule
@@ -90,13 +121,18 @@ endmodule
 
 module fourdig_7seg(
 	input clk,
+	input blink_clk,
+	input [3:0] blink_which, // 0000 for nothing, 1100 for min, 0011 for sec
 	input [6:0] minutes,
 	input [6:0] seconds,
 	output [7:0] seg,
-	output reg [3:0] an);
+	output [3:0] an);
 
 reg [1:0] ctr;
 reg [3:0] dig;
+reg [3:0] an_fast;
+
+assign an = an_fast | (blink_which * blink_clk);
 
 to_7seg To_7Seg(.dig(dig), .seg(seg));
 	
@@ -104,15 +140,15 @@ always @(posedge clk) begin
 ctr <= ctr+1;
 if (ctr == 0) begin
 	dig <= seconds % 10;
-	an <= 4'b1110;
+	an_fast <= 4'b1110;
 end else if (ctr == 1) begin
-	an <= 4'b1101;
+	an_fast <= 4'b1101;
 	dig <= seconds / 10;
 end else if (ctr == 2) begin
 	dig <= minutes % 10;
-	an <= 4'b1011;
+	an_fast <= 4'b1011;
 end else begin
-	an <= 4'b0111;
+	an_fast <= 4'b0111;
 	dig <= minutes / 10;
 end
 	
@@ -147,5 +183,3 @@ else if (dig == 1)
 end
 	
 endmodule
-
-
